@@ -1,0 +1,310 @@
+{
+  "id": 19019,
+  "name": "Thunderfury, Blessed Blade of the Windseeker",
+  "model": "Sword_2H_Ashbringer02.mdx",
+  "phase": 3,
+  "icon": "inv_sword_39",
+  "buyCount": 1,
+  "buyPrice": 615704,
+  "sellPrice": 123140,
+  "displayClassOnTooltip": false,
+  "displayRaceOnTooltip": false,
+  "miscInfoMob": null,
+  "miscInfoDescription1": "Bindings of the Windseeker",
+  "miscInfoDescription2": null,
+  "miscInfoSubDescription": null,
+  "itemLevel": 80,
+  "requiredLevel": 60,
+  "displayRequiredLevelOnTooltip": true,
+  "miscInfoMinLevel": 60,
+  "maxCount": 1,
+  "stackSize": 1,
+  "containerSlots": null,
+  "dmg1Min": 44,
+  "dmg1Max": 115,
+  "dmg2Min": 16,
+  "dmg2Max": 30,
+  "armor": 0,
+  "block": 0,
+  "weaponSpeed": 1900,
+  "resistanceHoly": 0,
+  "resistanceFire": 8,
+  "resistanceNature": 9,
+  "resistanceFrost": 0,
+  "resistanceShadow": 0,
+  "resistanceArcane": 0,
+  "durability": 125,
+  "startsQuest": false,
+  "description": null,
+  "duration": 0,
+  "pageText": 0,
+  "requiredSkillRank": 0,
+  "spellCharges": 0,
+  "itemTypeId": 2,
+  "itemSubTypeId": 30,
+  "itemQualityId": 5,
+  "itemSlotId": 13,
+  "itemBondingTypeId": 1,
+  "skillId": null,
+  "requiredSkillId": null,
+  "itemSourceId": 9,
+  "locationId": null,
+  "miscInfoLocation1": 2717,
+  "subLocationId": null,
+  "miscInfoSubLocation1": null,
+  "miscInfoLocation2": null,
+  "factionId": null,
+  "requiredRepFactionId": null,
+  "reputationRankId": null,
+  "requiredRepRankId": null,
+  "spellSchoolId": null,
+  "dmg1TypeId": 0,
+  "dmg2TypeId": 3,
+  "spellId": null,
+  "requiredSpellId": null,
+  "npcSpecialInfoId": null,
+  "miscInfoLocation": {
+    "id": 2717,
+    "name": "Molten Core",
+    "suggestedLevel": 0,
+    "areaId": 409
+  },
+  "miscInfoSubLocation": null,
+  "miscInfoLocationSecondary": null,
+  "dmg1Type": {
+    "id": 0,
+    "name": "Normal"
+  },
+  "requiredSkill": null,
+  "dmg2Type": {
+    "id": 3,
+    "name": "Nature"
+  },
+  "stats": [
+    {
+      "id": 3,
+      "name": "Agility",
+      "ItemStats": {
+        "value": 5,
+        "itemId": 19019,
+        "statId": 3
+      }
+    },
+    {
+      "id": 7,
+      "name": "Stamina",
+      "ItemStats": {
+        "value": 8,
+        "itemId": 19019,
+        "statId": 7
+      }
+    }
+  ],
+  "itemSubType": {
+    "id": 30,
+    "subTypeId": 7,
+    "itemTypeId": 2,
+    "name": "Sword",
+    "hand": 1,
+    "note": "One handed"
+  },
+  "itemType": {
+    "id": 2,
+    "name": "Weapon"
+  },
+  "spellEffects": [
+    {
+      "id": 21992,
+      "name": "Thunderfury",
+      "icon": "spell_nature_cyclone",
+      "subtext": null,
+      "description": "Blasts your enemy with lightning, dealing 300 Nature damage and then jumping to additional nearby enemies. Each jump reduces that victim's Nature resistance by 25. Affects 0 targets. Your primary target is also consumed by a cyclone, slowing its attack speed by 20% for 12 seconds.",
+      "auraDescription": "Nature resistance reduced by 25.",
+      "baseLevel": 63,
+      "level": 63,
+      "durationBase": "12 seconds",
+      "durationPerLevel": null,
+      "durationMax": null,
+      "resourceCost": 0,
+      "resourceCostIsPercentage": false,
+      "resourceType": "Mana",
+      "channeled": false,
+      "castTime": 0,
+      "cooldown": 0,
+      "requiresObject": null,
+      "requiredSkillValue": null,
+      "spellSchoolId": 3,
+      "spellRangeId": 2,
+      "classId": null,
+      "raceId": null,
+      "ItemSpells": {
+        "itemId": 19019,
+        "spellId": 21992
+      },
+      "SpellEffects": [
+        {
+          "id": 18486,
+          "miscValue": 8,
+          "max": -24,
+          "min": -25,
+          "mechanic": 0,
+          "radiusIndex": 0,
+          "amplitude": 0,
+          "multipleValue": null,
+          "chainTarget": 5,
+          "auraEffectId": 22,
+          "spellTriggerId": null,
+          "itemId": null,
+          "effectId": 6,
+          "SpellsEffects": {
+            "spellId": 21992,
+            "SpellEffectId": 18486
+          },
+          "effect": {
+            "id": 6,
+            "name": "Apply Aura"
+          },
+          "spellTrigger": null
+        },
+        {
+          "id": 18487,
+          "miscValue": 0,
+          "max": 301,
+          "min": 300,
+          "mechanic": 0,
+          "radiusIndex": 0,
+          "amplitude": 0,
+          "multipleValue": null,
+          "chainTarget": 0,
+          "auraEffectId": null,
+          "spellTriggerId": null,
+          "itemId": null,
+          "effectId": 2,
+          "SpellsEffects": {
+            "spellId": 21992,
+            "SpellEffectId": 18487
+          },
+          "effect": {
+            "id": 2,
+            "name": "School Damage"
+          },
+          "spellTrigger": null
+        },
+        {
+          "id": 18488,
+          "miscValue": 0,
+          "max": 0,
+          "min": 0,
+          "mechanic": 0,
+          "radiusIndex": 0,
+          "amplitude": 0,
+          "multipleValue": null,
+          "chainTarget": 0,
+          "auraEffectId": null,
+          "spellTriggerId": 27648,
+          "itemId": null,
+          "effectId": 64,
+          "SpellsEffects": {
+            "spellId": 21992,
+            "SpellEffectId": 18488
+          },
+          "effect": {
+            "id": 64,
+            "name": "Trigger Spell"
+          },
+          "spellTrigger": {
+            "id": 27648,
+            "name": "Thunderfury",
+            "icon": "spell_nature_cyclone",
+            "subtext": null,
+            "description": null,
+            "auraDescription": "Increases time between attacks by 20%.",
+            "baseLevel": 63,
+            "level": 63,
+            "durationBase": "12 seconds",
+            "durationPerLevel": null,
+            "durationMax": null,
+            "resourceCost": 0,
+            "resourceCostIsPercentage": false,
+            "resourceType": "Mana",
+            "channeled": false,
+            "castTime": 0,
+            "cooldown": 0,
+            "requiresObject": null,
+            "requiredSkillValue": null,
+            "spellSchoolId": 3,
+            "spellRangeId": 13,
+            "classId": null,
+            "raceId": null,
+            "reagents": []
+          }
+        }
+      ]
+    }
+  ],
+  "itemSlot": {
+    "id": 13,
+    "name": "Weapon"
+  },
+  "randomProperties": [],
+  "spellTriggers": [
+    {
+      "id": 2,
+      "name": "Chance on Hit",
+      "ItemSpellTriggers": {
+        "itemId": 19019,
+        "spellTriggerId": 2
+      }
+    }
+  ],
+  "itemQuality": {
+    "id": 5,
+    "name": "Legendary",
+    "colorName": "Orange",
+    "colorCode": "ff8000"
+  },
+  "itemSource": {
+    "id": 9,
+    "name": "Raid"
+  },
+  "itemSets": [],
+  "allowedClasses": [
+    {
+      "id": 1,
+      "name": "Warrior",
+      "colorCode": "C79C6E",
+      "ItemAllowedClasses": {
+        "itemId": 19019,
+        "classId": 1
+      }
+    },
+    {
+      "id": 2,
+      "name": "Paladin",
+      "colorCode": "F58CBA",
+      "ItemAllowedClasses": {
+        "itemId": 19019,
+        "classId": 2
+      }
+    },
+    {
+      "id": 3,
+      "name": "Hunter",
+      "colorCode": "ABD473",
+      "ItemAllowedClasses": {
+        "itemId": 19019,
+        "classId": 3
+      }
+    },
+    {
+      "id": 4,
+      "name": "Rogue",
+      "colorCode": "FFF569",
+      "ItemAllowedClasses": {
+        "itemId": 19019,
+        "classId": 4
+      }
+    }
+  ],
+  "allowedRaces": []
+}

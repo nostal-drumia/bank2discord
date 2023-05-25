@@ -1,0 +1,176 @@
+{
+  "id": 1728,
+  "name": "Teebu's Blazing Longsword",
+  "model": "Sword_1H_Fire_A_01.mdx",
+  "phase": 1,
+  "icon": "inv_sword_22",
+  "buyCount": 1,
+  "buyPrice": 435040,
+  "sellPrice": 87008,
+  "displayClassOnTooltip": false,
+  "displayRaceOnTooltip": false,
+  "miscInfoMob": "Elite Mobs",
+  "miscInfoDescription1": null,
+  "miscInfoDescription2": null,
+  "miscInfoSubDescription": null,
+  "itemLevel": 65,
+  "requiredLevel": 60,
+  "displayRequiredLevelOnTooltip": true,
+  "miscInfoMinLevel": 60,
+  "maxCount": 1,
+  "stackSize": 1,
+  "containerSlots": null,
+  "dmg1Min": 96,
+  "dmg1Max": 178,
+  "dmg2Min": 0,
+  "dmg2Max": 0,
+  "armor": 0,
+  "block": 0,
+  "weaponSpeed": 2900,
+  "resistanceHoly": 0,
+  "resistanceFire": 0,
+  "resistanceNature": 0,
+  "resistanceFrost": 0,
+  "resistanceShadow": 0,
+  "resistanceArcane": 0,
+  "durability": 105,
+  "startsQuest": false,
+  "description": null,
+  "duration": 0,
+  "pageText": 0,
+  "requiredSkillRank": 0,
+  "spellCharges": 0,
+  "itemTypeId": 2,
+  "itemSubTypeId": 30,
+  "itemQualityId": 4,
+  "itemSlotId": 21,
+  "itemBondingTypeId": 2,
+  "skillId": null,
+  "requiredSkillId": null,
+  "itemSourceId": 3,
+  "locationId": null,
+  "miscInfoLocation1": null,
+  "subLocationId": null,
+  "miscInfoSubLocation1": null,
+  "miscInfoLocation2": null,
+  "factionId": null,
+  "requiredRepFactionId": null,
+  "reputationRankId": null,
+  "requiredRepRankId": null,
+  "spellSchoolId": null,
+  "dmg1TypeId": 0,
+  "dmg2TypeId": 0,
+  "spellId": null,
+  "requiredSpellId": null,
+  "npcSpecialInfoId": null,
+  "miscInfoLocation": null,
+  "miscInfoSubLocation": null,
+  "miscInfoLocationSecondary": null,
+  "dmg1Type": {
+    "id": 0,
+    "name": "Normal"
+  },
+  "requiredSkill": null,
+  "dmg2Type": {
+    "id": 0,
+    "name": "Normal"
+  },
+  "stats": [],
+  "itemSubType": {
+    "id": 30,
+    "subTypeId": 7,
+    "itemTypeId": 2,
+    "name": "Sword",
+    "hand": 1,
+    "note": "One handed"
+  },
+  "itemType": {
+    "id": 2,
+    "name": "Weapon"
+  },
+  "spellEffects": [
+    {
+      "id": 18086,
+      "name": "Firebolt",
+      "icon": "spell_fire_firebolt02",
+      "subtext": null,
+      "description": "Blasts a target for 150 Fire damage.",
+      "auraDescription": null,
+      "baseLevel": 45,
+      "level": 45,
+      "durationBase": null,
+      "durationPerLevel": null,
+      "durationMax": null,
+      "resourceCost": 18,
+      "resourceCostIsPercentage": false,
+      "resourceType": "Mana",
+      "channeled": false,
+      "castTime": 3000,
+      "cooldown": 0,
+      "requiresObject": null,
+      "requiredSkillValue": null,
+      "spellSchoolId": 2,
+      "spellRangeId": 4,
+      "classId": null,
+      "raceId": null,
+      "ItemSpells": {
+        "itemId": 1728,
+        "spellId": 18086
+      },
+      "SpellEffects": [
+        {
+          "id": 14881,
+          "miscValue": 0,
+          "max": 151,
+          "min": 150,
+          "mechanic": 0,
+          "radiusIndex": 0,
+          "amplitude": 0,
+          "multipleValue": null,
+          "chainTarget": 0,
+          "auraEffectId": null,
+          "spellTriggerId": null,
+          "itemId": null,
+          "effectId": 2,
+          "SpellsEffects": {
+            "spellId": 18086,
+            "SpellEffectId": 14881
+          },
+          "effect": {
+            "id": 2,
+            "name": "School Damage"
+          },
+          "spellTrigger": null
+        }
+      ]
+    }
+  ],
+  "itemSlot": {
+    "id": 21,
+    "name": "Main hand"
+  },
+  "randomProperties": [],
+  "spellTriggers": [
+    {
+      "id": 2,
+      "name": "Chance on Hit",
+      "ItemSpellTriggers": {
+        "itemId": 1728,
+        "spellTriggerId": 2
+      }
+    }
+  ],
+  "itemQuality": {
+    "id": 4,
+    "name": "Epic",
+    "colorName": "Purple",
+    "colorCode": "a335ee"
+  },
+  "itemSource": {
+    "id": 3,
+    "name": "World Drop"
+  },
+  "itemSets": [],
+  "allowedClasses": [],
+  "allowedRaces": []
+}
