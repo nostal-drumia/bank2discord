@@ -2,8 +2,8 @@
 BagnonDB = {
 	["version"] = "6.6.30",
 	["wowVersion"] = "1.12.1",
-	["NostalGeek 1.12"] = {
-		["Horsolbank"] = {
+	["varimathras"] = {
+		["bank"] = {
 			[1] = {
 				[1] = "16673:0:0:0,",
 				[3] = "13081:0:0:0,",
