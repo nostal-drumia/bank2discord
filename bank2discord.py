@@ -1,29 +1,82 @@
 import json
+import os
 import requests
+import joblib
 import re
 import argparse
 import logging as log
 from discord_webhook import DiscordWebhook, DiscordEmbed
+from slpp import slpp as lua
+
+def main():
+  init = setup()
+  log.info("init.path=%s" % init['path'])
+  log.info("init.data=%s" % init['data'])
+  dp = init["data"]
+  if os.path.isfile(dp):
+    if os.stat(dp).st_size != 0:
+      f = open(dp, 'r')
+      m = str()
+      for l in f:
+        m+=l
+      messages = json.loads(m.replace('\'', '\"'))
+      for message in messages:
+        deleteWebhookMessage(message['webhook'], message['id'])
+      os.remove(dp)
+      exit(code=8)
+  else:
+    open(dp, 'a').close()
+
+  discord_messages = list()
+
+  b = bagnonInventory(init['path'], init['server'], init['character'])
+  items = list()
+  for inventory in b.inventory:
+    item = wowDb(inventory['id'], inventory['count'])
+    log.debug("json = %s" % str(item.item))
+    items.append(item)
+
+  for item in items:
+    log.info("type : %s", item.getItemType())
+    if str((item.getItemType())['name']).upper() == "WEAPON" and init["webhook_weapon"]:
+      webhook_url = init['webhook_weapon']
+    elif str((item.getItemType())['name']).upper() == "ARMOR" and init["webhook_armor"]:
+      webhook_url = init['webhook_armor']
+    elif str((item.getItemType())['name']).upper() == "RECIPE" and init["webhook_recipe"]:
+      webhook_url = init['webhook_recipe']
+    else:
+      webhook_url = init['webhook_other']
+    
+    r = sendWebhookMessage(webhook_url, item)
+    message = dict(webhook = webhook_url, id = r)
+    discord_messages.append(message)
+    f = open(dp, 'w')
+    f.write(str(discord_messages))
+    f.close()
+    log.info("webhook result=%s" % r)
 
 class bagnonInventory:
-  def __init__(self, path, pattern = r'([0-9]+\:){3}[0-9]+\,[0-9]*'):
+  def __init__(self, path, server, character, pattern = r'([0-9]+\:){3}[0-9]+\,[0-9]*'):
     self.path = path
     self.pattern = pattern
+    self.server = server
+    self.character = character
     self.inventory = list()
+    
     try:
       f = open(self.path, "r")
     except:
       log.critical("Can't open BAGNON lua file")
       exit(1)
-    for line in f:
-      search = re.search(self.pattern, line)
-      if search:
-        self.inventory.append({'id':(search.group()).split(':')[0], 'count':((search.group()).split(',')[1] or 1)})
-  
-  def search(self, id):
-    for i in self.inventory:
-      if i['id'] == str(id):
-        return i
+
+    content = lua.decode("{" + (f.read()).replace("\n", '') + "}")
+    inventory = ((content.get("BagnonDB")).get(server)).get(character)
+    
+    for bag in inventory.values():
+      if type(bag) is dict:
+        for entry in bag.values():
+          if re.search(self.pattern, entry):
+            self.inventory.append({'id':entry.split(':')[0], 'count':(entry.split(',')[1] or 1)})
 
 class wowDb:
   def __init__(self, id, count):
@@ -87,7 +140,7 @@ class wowDb:
   
   def getWeaponSpeed(self):
     if self.item.get("weaponSpeed") is not None:
-      return round((self.item.get("weaponSpeed")*0.01), 2)
+      return round((self.item.get("weaponSpeed")*0.001), 2)
     else:
       return 0
   
@@ -138,7 +191,10 @@ class wowDb:
     return self.item['itemSubType']
 
   def getItemType(self):
-    return self.item['itemType']
+    if self.item['itemType'] is not None:
+      return self.item['itemType']
+    else:
+      return None
 
   def getSpellEffects(self):
     return self.item.get("spellEffects")
@@ -171,32 +227,7 @@ class wowDb:
         r += "\n+" + str(stat['ItemStats']['value']) + " " + stat['name']
     return r
 
-def main():
-  init = setup()
-  log.debug("init.path=%s" % init['path'])
-  
-
-  b = bagnonInventory(init['path'])
-  items = list()
-  for inventory in b.inventory:
-    item = wowDb(inventory['id'], inventory['count'])
-    log.debug("json = %s" % str(item.item))
-    items.append(item)
-
-  for item in items:
-    log.info("type : %s", item.getItemType())
-    if str((item.getItemType())['name']).upper() == "WEAPON" and init["webhook_weapon"]:
-      r = sendWebhook(init['webhook_weapon'], item)
-    elif str((item.getItemType())['name']).upper() == "ARMOR" and init["webhook_armor"]:
-      r = sendWebhook(init['webhook_armor'], item)
-    elif str((item.getItemType())['name']).upper() == "RECIPE" and init["webhook_recipe"]:
-      r = sendWebhook(init['webhook_recipe'], item)
-    else:
-      r = sendWebhook(init['webhook_other'], item)
-
-    log.info("webhook result=%s" % r)
-
-def sendWebhook(url: str, item: wowDb):
+def sendWebhookMessage(url: str, item: wowDb):
 
   webhook = DiscordWebhook(url = url, rate_limit_retry=True)
   log.info("id=%s,Name=%s, color=%s, icon=%s, RequiredLevel=%s",
@@ -293,27 +324,43 @@ def sendWebhook(url: str, item: wowDb):
   log.debug("DEBUG: discord webhook embeds %s" %webhook.embeds)
   response = webhook.execute()
   log.debug("DEBUG: discord webhook %s" % str(response))
+  return webhook.id
+
+def deleteWebhookMessage(url: str, id: str):
+  webhook = DiscordWebhook(url = url, id = id, rate_limit_retry=True)
+  webhook.delete()
 
 def setup():
 
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='''Bagnon to discord''')
   parser.add_argument('-b', metavar='bagnon', help='Path to file of Bagnon Inventory')
+  parser.add_argument('-c', metavar='character', help='character to push inventory')
+  parser.add_argument('-s', metavar='server', help='name of server in Bagnon Inventory')
   parser.add_argument('--weapon', metavar='webhook_weapon', help='Discord WebHook URL for Weapon')
   parser.add_argument('--armor', metavar='webhook_armor', help='Discord WebHook URL for Armor')
   parser.add_argument('--other', metavar='webhook_other', help='Discord WebHook URL for Armor')
   parser.add_argument('--recipe', metavar='webhook_receipe', help='Discord WebHook URL for Receipe')
   parser.add_argument('-v', action='store_true', help='verbose mode')
+
   args = parser.parse_args()
+
+  if args.v:
+    log.basicConfig(format="%(levelname)s: %(message)s", level=log.DEBUG)
+  else:
+    log.basicConfig(format="%(levelname)s: %(message)s", level=log.INFO)
+
+  
+  log.debug("START")
   try: 
     path = args.b
+    server = args.s
+    character = args.c
     webhook_weapon = args.weapon
     webhook_armor = args.armor
     webhook_recipe = args.recipe
     webhook_other = args.other
-    if args.v:
-      log.basicConfig(format="%(levelname)s: %(message)s", level=log.DEBUG)
-    else:
-      log.basicConfig(format="%(levelname)s: %(message)s", level=log.INFO)
+
+
     
     log.debug(vars(args))
     # if args.all[0] is not None:
@@ -327,7 +374,11 @@ def setup():
     log.error("All required have not been set")
     log.error(vars(args))
     exit(code = 2)
-  return({"path": path, "webhook_weapon": webhook_weapon, "webhook_armor": webhook_armor, "webhook_recipe": webhook_recipe, "webhook_other": webhook_other})
+  
+  data = ".data/discord-" + str(server).replace(' ', '') + "-" + character
+  log.debug("DATA %s", data)
+
+  return({"path": path, "data": data, "server": server, "character": character, "webhook_weapon": webhook_weapon, "webhook_armor": webhook_armor, "webhook_recipe": webhook_recipe, "webhook_other": webhook_other})
 
 if __name__ == "__main__":
   main()
