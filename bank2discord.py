@@ -26,10 +26,11 @@ class bagnonInventory:
         return i
 
 class wowDb:
-  def __init__(self, id):
+  def __init__(self, id, count):
     self.wowdb = "https://api.wowclassicdb.com/item/"
     self.iconURL = "https://cdn.wowclassicdb.com/icons/"
     self.url = self.wowdb + id
+    self.count = count
     r = requests.get(self.url)
     self.item = json.loads(r.content.decode('utf8'))
   
@@ -39,6 +40,10 @@ class wowDb:
   def getId(self):
     log.debug("id=%s" % self.item.get("id"))
     return self.item.get("id")
+  
+  def getCount(self):
+    log.debug("Count=%s" % self.count)
+    return self.count
   
   def getName(self):
     log.debug("name=%s" % self.item.get("name"))
@@ -151,7 +156,7 @@ class wowDb:
     return self.item.get("itemSets")
   
   def getIconURL(self):
-    return str(self.iconURL + self.getIcon()) + ".jpg"
+    return str(self.iconURL + (self.getIcon()).get('name')) + ".jpg"
   
   def getStats(self):
     return self.item['stats']
@@ -166,7 +171,6 @@ class wowDb:
         r += "\n+" + str(stat['ItemStats']['value']) + " " + stat['name']
     return r
 
-
 def main():
   init = setup()
   log.debug("init.path=%s" % init['path'])
@@ -175,17 +179,25 @@ def main():
   b = bagnonInventory(init['path'])
   items = list()
   for inventory in b.inventory:
-    item = wowDb(inventory['id'])
+    item = wowDb(inventory['id'], inventory['count'])
     log.debug("json = %s" % str(item.item))
     items.append(item)
 
-  
-
   for item in items:
-    r = sendWebhook(init['webhook'], item)
+    log.info("type : %s", item.getItemType())
+    if str((item.getItemType())['name']).upper() == "WEAPON" and init["webhook_weapon"]:
+      r = sendWebhook(init['webhook_weapon'], item)
+    elif str((item.getItemType())['name']).upper() == "ARMOR" and init["webhook_armor"]:
+      r = sendWebhook(init['webhook_armor'], item)
+    elif str((item.getItemType())['name']).upper() == "RECIPE" and init["webhook_recipe"]:
+      r = sendWebhook(init['webhook_recipe'], item)
+    else:
+      r = sendWebhook(init['webhook_other'], item)
+
     log.info("webhook result=%s" % r)
 
 def sendWebhook(url: str, item: wowDb):
+
   webhook = DiscordWebhook(url = url, rate_limit_retry=True)
   log.info("id=%s,Name=%s, color=%s, icon=%s, RequiredLevel=%s",
             item.getId(),
@@ -196,6 +208,8 @@ def sendWebhook(url: str, item: wowDb):
           )
   embed = DiscordEmbed(title = str(item.getName()), color = int((item.getItemQuality())['colorCode'], base=16))
   embed.set_thumbnail(url = str(item.getIconURL()))
+  u = "https://www.wowhead.com/classic/fr/item=" + str(item.getId())
+  embed.set_url(url = u)
   embed.set_timestamp()
   if item.getRequiredLevel() > 0:
     embed.add_embed_field(name = "Level required", value = str(item.getRequiredLevel()),inline=True)
@@ -209,8 +223,8 @@ def sendWebhook(url: str, item: wowDb):
     embed.add_embed_field(name = "Block", value = str(item.getBlock()),inline=True)
   if item.getDmg1Min() > 0:
     name = "Damage " + str(item.getDmg1Type()['name'])
-    embed.add_embed_field(name = name, value = "+" + str(item.getDmg1Min()) + " - " + str(item.getDmg1Max()),inline=True)
-  if item.getWeaponSpeed() is not None or item.getWeaponSpeed() > 0:
+    
+  if item.getWeaponSpeed() is not None and float(item.getWeaponSpeed()) > 0:
     embed.add_embed_field(name = "Speed", value = str(item.getWeaponSpeed()),inline=True)
   if item.getDmg2Min() > 0:
     name = "Damage" + str(item.getDmg2Type()['name'])
@@ -221,12 +235,58 @@ def sendWebhook(url: str, item: wowDb):
     r = ""
     se = item.getSpellEffects()
     st = item.getSpellTriggers()
-    for i in range(len(item.getSpellEffects())):
-      if st is not None and st[i] is not None:
-        r = st[i].get("name") + " : " + se[i].get("description")
+    if len(se) == len(st) and st is not None:
+      for i in range(len(se)):
+        if i == 0:
+          r += st[i].get("name") + " : " + se[i].get("description")
+        else:
+          r += "\n" + st[i].get("name") + " : " + se[i].get("description")
+    elif len(se) > len(st) and len(st) == 1 and st is not None:
+      for i in range(len(se)):
+        if i == 0:
+          r += st[0].get("name") + " : " + se[i].get("description")
+        else:
+          r += "\n" + st[0].get("name") + " : " + se[i].get("description")
+    elif len(se) > len(st) and len(st) > 1 and st is not None:
+      if i < (len(se)-1):
+        if i == 0:
+          r += st[0].get("name") + " : " + se[i].get("description")
       else:
-        r = se[i].get("description")
+        r += "\n" + st[1].get("name") + " : " + se[i].get("description")
+    elif st is None:
+      r += se[i].get("description")
     embed.add_embed_field(name = "SpellEffects", value = r, inline=True)
+  resist = ""
+  if item.getResistanceArcane() is not None and item.getResistanceArcane()>0:
+    if resist == "":
+      resist += "+" + str(item.getResistanceArcane()) + " Arcane"
+    else:
+      resist += "\n+" + str(item.getResistanceArcane()) + " Arcane"
+  if item.getResistanceFire() is not None and item.getResistanceFire() > 0:
+    if resist == "":
+      resist += "+" + str(item.getResistanceFire()) + " Fire"
+    else:
+      resist += "\n+" + str(item.getResistanceFire()) + " Fire"
+  if item.getResistanceHoly() is not None and item.getResistanceHoly() > 0:
+    if resist == "":
+      resist += "+" + str(item.getResistanceHoly()) + " Holy"
+    else:
+      resist += "\n+" + str(item.getResistanceHoly()) + " Holy"
+  if item.getResistanceNature() is not None and item.getResistanceNature() > 0:
+    if resist == "":
+      resist += "+" + str(item.getResistanceNature()) + " Nature"
+    else:
+      resist += "\n+" + str(item.getResistanceNature()) + " Nature"
+  if item.getResistanceShadow() is not None and item.getResistanceShadow() > 0:
+    if resist == "":
+      resist += "+" + str(item.getResistanceShadow()) + " Shadow"
+    else:
+      resist += "\n+" + str(item.getResistanceShadow()) + " Shadow"
+  if resist != "":
+    embed.add_embed_field(name = "Resitance", value = resist, inline = False )
+  if int(item.getCount()) > 1 :
+    embed.add_embed_field(name = "Count", value = str(item.getCount()))
+  
 
   webhook.add_embed(embed)
   webhook.embeds
@@ -237,20 +297,37 @@ def sendWebhook(url: str, item: wowDb):
 def setup():
 
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='''Bagnon to discord''')
-  parser.add_argument('-b', metavar='bagnon', nargs=1, help='Path to file of Bagnon Inventory', required=True)
-  parser.add_argument('-u', metavar='webook_url', nargs=1, help='Discord WebHook URL', required=True)
+  parser.add_argument('-b', metavar='bagnon', help='Path to file of Bagnon Inventory')
+  parser.add_argument('--weapon', metavar='webhook_weapon', help='Discord WebHook URL for Weapon')
+  parser.add_argument('--armor', metavar='webhook_armor', help='Discord WebHook URL for Armor')
+  parser.add_argument('--other', metavar='webhook_other', help='Discord WebHook URL for Armor')
+  parser.add_argument('--recipe', metavar='webhook_receipe', help='Discord WebHook URL for Receipe')
   parser.add_argument('-v', action='store_true', help='verbose mode')
   args = parser.parse_args()
   try: 
-    path = args.b[0]
-    webhook = args.u[0]
+    path = args.b
+    webhook_weapon = args.weapon
+    webhook_armor = args.armor
+    webhook_recipe = args.recipe
+    webhook_other = args.other
     if args.v:
       log.basicConfig(format="%(levelname)s: %(message)s", level=log.DEBUG)
     else:
       log.basicConfig(format="%(levelname)s: %(message)s", level=log.INFO)
+    
+    log.debug(vars(args))
+    # if args.all[0] is not None:
+    if webhook_recipe is None or webhook_armor is None or webhook_weapon is None or webhook_other is None:
+      log.error("If you don't set -a argument you need to set four other")
+      exit(code= 2)
+    # else:
+    #   log.info("none")
+    #   webhook_all = args.all[0]
   except:
     log.error("All required have not been set")
-  return({"path": path, "webhook": webhook})
+    log.error(vars(args))
+    exit(code = 2)
+  return({"path": path, "webhook_weapon": webhook_weapon, "webhook_armor": webhook_armor, "webhook_recipe": webhook_recipe, "webhook_other": webhook_other})
 
 if __name__ == "__main__":
   main()
